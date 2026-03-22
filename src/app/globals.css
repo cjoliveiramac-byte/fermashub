@@ -7,6 +7,8 @@
   --fh-yellow: #f5b841;
   --fh-card: #ffffff;
   --fh-muted: #6b6b6b;
+  --fh-bg-overlay: rgba(246, 246, 247, 0.55);
+  --fh-bg-image: url("/fundo%20novo.jpeg");
 }
 
 @theme inline {
@@ -18,10 +20,11 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #0b0f11;
     --foreground: #ededed;
-    --fh-card: #111214;
+    --fh-card: #10161a;
     --fh-muted: #a1a1aa;
+    --fh-bg-overlay: rgba(11, 15, 17, 0.65);
   }
 }
 
@@ -29,6 +32,16 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  background-image:
+    radial-gradient(circle at 10% 15%, rgba(15, 107, 95, 0.28), transparent 50%),
+    radial-gradient(circle at 90% 85%, rgba(245, 184, 65, 0.24), transparent 50%),
+    radial-gradient(circle at 50% 0%, rgba(15, 107, 95, 0.2), transparent 45%),
+    linear-gradient(var(--fh-bg-overlay), var(--fh-bg-overlay)),
+    var(--fh-bg-image);
+  background-repeat: no-repeat;
+  background-size: 560px 560px, 560px 560px, 720px 720px, cover, cover;
+  background-position: top left, bottom right, top center, center, center;
+  background-attachment: fixed;
 }
 
 @keyframes ring-rotate {

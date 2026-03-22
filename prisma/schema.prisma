@@ -1,0 +1,349 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  email        String   @unique
+  name         String?
+  username     String   @unique
+  passwordHash String?
+  role         Role     @default(USER)
+  image        String?
+  bio          String?
+  website      String?
+  location     String?
+  status       UserStatus @default(ACTIVE)
+  bannedAt     DateTime?
+  banReason    String?
+  banExpiresAt DateTime?
+  bannedById   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Post {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  title          String?
+  content        String
+  mediaUrl       String?
+  mediaType      MediaType?
+  authorId       String
+  authorName     String
+  authorEmail    String
+  authorUsername String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Comment {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId         String
+  authorId       String
+  authorName     String
+  authorUsername String
+  content        String
+  createdAt      DateTime @default(now())
+}
+
+model Like {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId])
+}
+
+model CommentLike {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  commentId String
+  userId    String
+  createdAt DateTime @default(now())
+
+  @@unique([commentId, userId])
+}
+
+model Follow {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  followerId   String
+  followingId  String
+  createdAt    DateTime @default(now())
+
+  @@unique([followerId, followingId])
+}
+
+model Notification {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  recipientId String
+  actorId     String
+  type        NotificationType
+  postId      String?
+  message     String?
+  readAt      DateTime?
+  createdAt   DateTime @default(now())
+}
+
+model Conversation {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String?
+  type      ConversationType @default(DIRECT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ConversationMember {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId String
+  userId         String
+  role           MemberRole @default(MEMBER)
+  lastReadAt     DateTime?
+  createdAt      DateTime @default(now())
+
+  @@unique([conversationId, userId])
+}
+
+model Message {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId String
+  senderId       String
+  senderName     String
+  content        String
+  mediaUrl       String?
+  mediaType      MediaType?
+  mediaName      String?
+  status         MessageStatus @default(SENT)
+  deliveredAt    DateTime?
+  readAt         DateTime?
+  editedAt       DateTime?
+  deletedAt      DateTime?
+  deletedById    String?
+  createdAt      DateTime @default(now())
+}
+
+model MessageReaction {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  messageId String
+  userId    String
+  emoji     String
+  createdAt DateTime @default(now())
+
+  @@unique([messageId, userId, emoji])
+}
+
+model Report {
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  reporterId   String
+  type         ReportType
+  targetId     String
+  reason       String
+  priority     Int         @default(0)
+  status       ReportStatus @default(OPEN)
+  createdAt    DateTime    @default(now())
+  resolvedAt   DateTime?
+  resolvedById String?
+}
+
+model Log {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String
+  action     String
+  metadata   String?
+  createdAt  DateTime @default(now())
+}
+
+model ApiKey {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  key       String
+  prefix    String?
+  name      String?
+  createdBy String?
+  createdAt DateTime @default(now())
+  revoked   Boolean  @default(false)
+  revokedAt DateTime?
+}
+
+model FeatureFlag {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  name      String  @unique
+  enabled   Boolean @default(false)
+  updatedAt DateTime @updatedAt
+}
+
+model BannedIp {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  ip         String   @unique
+  reason     String?
+  bannedById String
+  createdAt  DateTime @default(now())
+}
+
+model Event {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  location    String
+  date        DateTime
+  createdById String
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Video {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  url         String
+  createdById String
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PlatformSetting {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  platformName    String   @default("FermasHub")
+  maintenanceMode Boolean  @default(false)
+  updatedAt       DateTime @updatedAt
+}
+
+model Group {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  bannerUrl   String?
+  isPublic    Boolean  @default(true)
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model GroupMember {
+  id         String           @id @default(auto()) @map("_id") @db.ObjectId
+  groupId    String
+  userId     String
+  role       GroupRole        @default(MEMBER)
+  status     GroupMemberStatus @default(ACTIVE)
+  mutedUntil DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([groupId, userId])
+}
+
+model Channel {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  groupId     String
+  name        String
+  type        ChannelType @default(TEXT)
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ChannelMessage {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  channelId  String
+  senderId   String
+  senderName String
+  content    String
+  mediaUrl   String?
+  mediaType  MediaType?
+  mediaName  String?
+  pinnedAt   DateTime?
+  pinnedById String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model ChannelMessageReaction {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  messageId String
+  userId    String
+  emoji     String
+  createdAt DateTime @default(now())
+
+  @@unique([messageId, userId, emoji])
+}
+
+enum Role {
+  USER
+  MODERATOR
+  DEVELOPER
+}
+
+enum UserStatus {
+  ACTIVE
+  BANNED
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  FILE
+}
+
+enum NotificationType {
+  LIKE
+  COMMENT
+  FOLLOW
+  MESSAGE
+  SYSTEM
+}
+
+enum ConversationType {
+  DIRECT
+  GROUP
+}
+
+enum MemberRole {
+  MEMBER
+  ADMIN
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+}
+
+enum ReportStatus {
+  OPEN
+  REVIEWING
+  APPROVED
+  REJECTED
+  DELETED
+  CLOSED
+}
+
+enum ReportType {
+  POST
+  COMMENT
+  MESSAGE
+  USER
+}
+
+enum GroupRole {
+  OWNER
+  ADMIN
+  MODERATOR
+  MEMBER
+}
+
+enum GroupMemberStatus {
+  ACTIVE
+  MUTED
+  BANNED
+}
+
+enum ChannelType {
+  TEXT
+  MEDIA
+  ANNOUNCEMENT
+}

@@ -1,4 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import AuthProvider from "@/components/AuthProvider";
+import DisclaimerGate from "@/components/DisclaimerGate";
+import SiteFooter from "@/components/SiteFooter";
 import ToastProvider from "@/components/ToastProvider";
 import "./globals.css";
 
@@ -14,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "FermasHub",
-  description: "Rede privada do Colegio Fermas",
+  description: "Rede privada da Associacao do Colegio Fermas",
 };
 
 export default function RootLayout({ children }) {
@@ -23,8 +26,12 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ToastProvider />
-        {children}
+        <AuthProvider>
+          <ToastProvider />
+          <DisclaimerGate />
+          {children}
+          <SiteFooter />
+        </AuthProvider>
       </body>
     </html>
   );
