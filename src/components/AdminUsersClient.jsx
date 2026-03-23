@@ -17,6 +17,7 @@ export default function AdminUsersClient() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [onlineIds, setOnlineIds] = useState(() => new Set());
 
   const loadUsers = useCallback(async (term = "") => {
     setLoading(true);
@@ -37,6 +38,26 @@ export default function AdminUsersClient() {
   useEffect(() => {
     loadUsers();
   }, [loadUsers]);
+
+  const loadOnline = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/online");
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      const ids = new Set(
+        (data?.online || []).map((entry) => entry.userId || entry)
+      );
+      setOnlineIds(ids);
+    } catch {
+      // Ignore online errors.
+    }
+  }, []);
+
+  useEffect(() => {
+    loadOnline();
+    const intervalId = setInterval(loadOnline, 30000);
+    return () => clearInterval(intervalId);
+  }, [loadOnline]);
 
   const handleBan = async (userId) => {
     const reason = prompt("Motivo do banimento?") || "Sem motivo definido.";
@@ -132,60 +153,73 @@ export default function AdminUsersClient() {
           <div className="text-sm text-zinc-500">Nenhum utilizador.</div>
         ) : (
           <div className="space-y-3">
-            {users.map((user) => (
-              <div
-                key={user.id}
-                className="rounded-xl border border-zinc-200/70 p-4 text-sm dark:border-zinc-800"
-              >
-                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <div className="font-semibold">
-                      {user.name || user.username}
-                    </div>
-                    <div className="text-xs text-zinc-500">
-                      {user.email} - {user.role.toLowerCase()} - {user.status}
-                    </div>
-                    <div className="text-xs text-zinc-500">
-                      Criado em {formatDate(user.createdAt)}
-                    </div>
-                    {user.status === "BANNED" ? (
-                      <div className="mt-1 text-xs text-red-400">
-                        Banido até {formatDate(user.banExpiresAt) || "indefinido"}{" "}
-                        - {user.banReason || "Sem motivo"}
+            {users.map((user) => {
+              const isOnline = onlineIds.has(user.id);
+              return (
+                <div
+                  key={user.id}
+                  className="rounded-xl border border-zinc-200/70 p-4 text-sm dark:border-zinc-800"
+                >
+                  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <div className="font-semibold">
+                        {user.name || user.username}
                       </div>
-                    ) : null}
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      onClick={() => router.push(`/admin/users/${user.id}`)}
-                      className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-semibold text-zinc-600 dark:border-zinc-700 dark:text-zinc-200"
-                    >
-                      Ver perfil
-                    </button>
-                    <button
-                      onClick={() => handleSuspend(user.id)}
-                      className="rounded-full border border-amber-300 px-3 py-1 text-xs font-semibold text-amber-500 transition hover:border-amber-400"
-                    >
-                      Suspender
-                    </button>
-                    <button
-                      onClick={() => handleBan(user.id)}
-                      className="rounded-full border border-red-300 px-3 py-1 text-xs font-semibold text-red-500 transition hover:border-red-400"
-                    >
-                      Banir
-                    </button>
-                    {role === "developer" ? (
+                      <div className="mt-1 flex items-center gap-2 text-xs">
+                        <span
+                          className={`h-2 w-2 rounded-full ${
+                            isOnline ? "bg-emerald-500" : "bg-zinc-400/70"
+                          }`}
+                        />
+                        <span className="text-zinc-500">
+                          {isOnline ? "Online" : "Offline"}
+                        </span>
+                      </div>
+                      <div className="text-xs text-zinc-500">
+                        {user.email} - {user.role.toLowerCase()} - {user.status}
+                      </div>
+                      <div className="text-xs text-zinc-500">
+                        Criado em {formatDate(user.createdAt)}
+                      </div>
+                      {user.status === "BANNED" ? (
+                        <div className="mt-1 text-xs text-red-400">
+                          Banido até {formatDate(user.banExpiresAt) || "indefinido"}{" "}
+                          - {user.banReason || "Sem motivo"}
+                        </div>
+                      ) : null}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
                       <button
-                        onClick={() => handleDelete(user.id)}
-                        className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-semibold text-zinc-500"
+                        onClick={() => router.push(`/admin/users/${user.id}`)}
+                        className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-semibold text-zinc-600 dark:border-zinc-700 dark:text-zinc-200"
                       >
-                        Apagar conta
+                        Ver perfil
                       </button>
-                    ) : null}
+                      <button
+                        onClick={() => handleSuspend(user.id)}
+                        className="rounded-full border border-amber-300 px-3 py-1 text-xs font-semibold text-amber-500 transition hover:border-amber-400"
+                      >
+                        Suspender
+                      </button>
+                      <button
+                        onClick={() => handleBan(user.id)}
+                        className="rounded-full border border-red-300 px-3 py-1 text-xs font-semibold text-red-500 transition hover:border-red-400"
+                      >
+                        Banir
+                      </button>
+                      {role === "developer" ? (
+                        <button
+                          onClick={() => handleDelete(user.id)}
+                          className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-semibold text-zinc-500"
+                        >
+                          Apagar conta
+                        </button>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>

@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import AuthProvider from "@/components/AuthProvider";
 import DisclaimerGate from "@/components/DisclaimerGate";
+import PresenceBeacon from "@/components/PresenceBeacon";
 import SiteFooter from "@/components/SiteFooter";
 import ToastProvider from "@/components/ToastProvider";
 import "./globals.css";
@@ -29,6 +30,7 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <ToastProvider />
           <DisclaimerGate />
+          <PresenceBeacon />
           {children}
           <SiteFooter />
         </AuthProvider>

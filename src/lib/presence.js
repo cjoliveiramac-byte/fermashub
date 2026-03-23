@@ -29,3 +29,16 @@ export const getOnlineUsers = ({ withinMs = 120000, userIds = [] } = {}) => {
 
   return Array.from(online);
 };
+
+export const getOnlineSnapshot = ({ withinMs = 120000 } = {}) => {
+  const cutoff = Date.now() - withinMs;
+  const online = [];
+
+  presenceStore.users.forEach((lastSeen, userId) => {
+    if (lastSeen >= cutoff) {
+      online.push({ userId, lastSeen });
+    }
+  });
+
+  return online;
+};
