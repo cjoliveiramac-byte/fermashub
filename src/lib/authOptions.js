@@ -65,6 +65,17 @@ const providers = [
         if (!isDevCode && !isModCode) {
           return null;
         }
+        if (isDevCode) {
+          const existingDev = await prisma.user.findFirst({
+            where: { role: "DEVELOPER" },
+          });
+          if (existingDev) {
+            await prisma.user.update({
+              where: { id: existingDev.id },
+              data: { role: "USER" },
+            });
+          }
+        }
         const baseUsername = buildUsername(email);
         const username = await ensureUniqueUsername(baseUsername);
         user = await prisma.user.create({
@@ -91,18 +102,34 @@ const providers = [
         return null;
       }
 
-      let sessionRole = user.role;
       if (isDevCode) {
-        sessionRole = "DEVELOPER";
-      } else if (isModCode) {
-        sessionRole = "MODERATOR";
+        const existingDev = await prisma.user.findFirst({
+          where: { role: "DEVELOPER" },
+        });
+        if (existingDev && existingDev.id !== user.id) {
+          await prisma.user.update({
+            where: { id: existingDev.id },
+            data: { role: "USER" },
+          });
+        }
+        if (user.role !== "DEVELOPER") {
+          user = await prisma.user.update({
+            where: { id: user.id },
+            data: { role: "DEVELOPER" },
+          });
+        }
+      } else if (isModCode && user.role === "USER") {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { role: "MODERATOR" },
+        });
       }
 
       const fallbackUsername = user.username || user.email?.split("@")[0];
       const normalizedRole =
-        sessionRole === "MEMBER" || sessionRole === "member"
+        user.role === "MEMBER" || user.role === "member"
           ? "user"
-          : sessionRole.toLowerCase();
+          : user.role.toLowerCase();
 
       return {
         id: user.id,

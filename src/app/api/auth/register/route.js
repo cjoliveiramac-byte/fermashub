@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
@@ -42,7 +42,8 @@ export async function POST(request) {
     const body = await request.json();
     const name = normalize(body?.name);
     const email = normalizeEmail(body?.email);
-    const password = body?.password || "";
+    const rawPassword = body?.password || "";
+    const password = normalize(rawPassword);
     const accessCode = normalize(body?.accessCode);
 
     if (!email || !password) {
@@ -68,10 +69,10 @@ export async function POST(request) {
         where: { role: "DEVELOPER" },
       });
       if (devExists) {
-        return NextResponse.json(
-          { error: "Já existe um developer registado." },
-          { status: 409 }
-        );
+        await prisma.user.update({
+          where: { id: devExists.id },
+          data: { role: "USER" },
+        });
       }
       role = "DEVELOPER";
     } else if (mods.some((mod) => safeEqual(password, mod))) {
@@ -85,7 +86,7 @@ export async function POST(request) {
 
     const baseUsername = buildUsername(email);
     const username = await ensureUniqueUsername(baseUsername);
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(rawPassword, 10);
 
     const user = await prisma.user.create({
       data: {
@@ -109,7 +110,7 @@ export async function POST(request) {
     console.error("register error", error);
     if (error?.code === "P2002") {
       return NextResponse.json(
-        { error: "Email ou username já existe." },
+        { error: "Email ou username ja existe." },
         { status: 409 }
       );
     }
