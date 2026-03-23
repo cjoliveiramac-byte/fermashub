@@ -1,7 +1,6 @@
 ﻿"use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { signIn } from "next-auth/react";
@@ -60,11 +59,9 @@ export default function LoginPage() {
         <div className="relative z-10">
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 overflow-hidden rounded-2xl border border-white/30 shadow-sm">
-              <Image
+              <img
                 src="/fundo-novo.jpeg"
                 alt="FermasHub"
-                width={48}
-                height={48}
                 className="h-full w-full object-cover"
               />
             </div>

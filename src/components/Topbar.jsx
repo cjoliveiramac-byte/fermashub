@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import UserMenu from "@/components/UserMenu";
 
@@ -8,11 +7,9 @@ export default function Topbar() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
           <div className="h-9 w-9 overflow-hidden rounded-xl border border-zinc-200/70 bg-white shadow-sm dark:border-zinc-800/70 dark:bg-zinc-950">
-            <Image
+            <img
               src="/fundo-novo.jpeg"
               alt="FermasHub"
-              width={36}
-              height={36}
               className="h-full w-full object-cover"
             />
           </div>
