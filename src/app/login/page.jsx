@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { signIn } from "next-auth/react";
@@ -58,12 +59,15 @@ export default function LoginPage() {
         />
         <div className="relative z-10">
           <div className="flex items-center gap-3">
-            <div
-              className="h-12 w-12 overflow-hidden rounded-2xl border border-white/30 bg-cover bg-center shadow-sm"
-              style={{ backgroundImage: `url("${backgroundUrl}")` }}
-              role="img"
-              aria-label="FermasHub"
-            />
+            <div className="h-12 w-12 overflow-hidden rounded-2xl border border-white/30 shadow-sm">
+              <Image
+                src="/fundo%20novo.jpeg"
+                alt="FermasHub"
+                width={48}
+                height={48}
+                className="h-full w-full object-cover"
+              />
+            </div>
             <div>
               <h1 className="text-lg font-semibold">Entrar no FermasHub</h1>
               <p className="text-xs text-zinc-300">
