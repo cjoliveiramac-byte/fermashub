@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const backgroundUrl = "/fundo%20novo.jpeg";
+  const backgroundUrl = "/fundo-novo.jpeg";
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -61,7 +61,7 @@ export default function LoginPage() {
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 overflow-hidden rounded-2xl border border-white/30 shadow-sm">
               <Image
-                src="/fundo%20novo.jpeg"
+                src="/fundo-novo.jpeg"
                 alt="FermasHub"
                 width={48}
                 height={48}

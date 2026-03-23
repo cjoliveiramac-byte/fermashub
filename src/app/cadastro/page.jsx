@@ -15,7 +15,7 @@ export default function CadastroPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [logoVisible, setLogoVisible] = useState(true);
-  const backgroundUrl = "/fundo%20novo.jpeg";
+  const backgroundUrl = "/fundo-novo.jpeg";
   const brandSrc = backgroundUrl;
 
   const handleRegister = async (event) => {

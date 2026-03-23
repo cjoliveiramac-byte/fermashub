@@ -9,7 +9,7 @@ export default function Topbar() {
         <Link href="/" className="flex items-center gap-2">
           <div className="h-9 w-9 overflow-hidden rounded-xl border border-zinc-200/70 bg-white shadow-sm dark:border-zinc-800/70 dark:bg-zinc-950">
             <Image
-              src="/fundo%20novo.jpeg"
+              src="/fundo-novo.jpeg"
               alt="FermasHub"
               width={36}
               height={36}

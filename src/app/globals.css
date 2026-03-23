@@ -8,7 +8,7 @@
   --fh-card: #ffffff;
   --fh-muted: #6b6b6b;
   --fh-bg-overlay: rgba(246, 246, 247, 0.55);
-  --fh-bg-image: url("/fundo%20novo.jpeg");
+  --fh-bg-image: url("/fundo-novo.jpeg");
 }
 
 @theme inline {
